@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
 #include <array>
+#include <stack>
 
 class Processor
 {
@@ -11,8 +11,8 @@ public:
     ~Processor();
 
 private:
-    std::vector<uint16_t> stack;
-    std::array<uint16_t, 16> v;
-    uint16_t pc;
+    std::stack<uint16_t> stack;
+    std::array<uint16_t, 16> v; // labeled V0 to VF
     uint16_t vi;
-}
+    uint16_t pc;
+};

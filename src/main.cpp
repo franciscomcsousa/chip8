@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <unistd.h>
+#include <filesystem>
 #include "memory.h"
 
 const int cols = 64;
@@ -11,16 +12,24 @@ int main(int argc, char *argv[])
 {
     if (argc != 4)
     {
-        std::cerr << "Usage: " << argv[0] << " <Scale> <Delay> <ROM>\n";
+        std::cerr << "Usage: " << argv[0] << " <Scale> <Delay> <ROM>\n"
+                  << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
-    std::cout << argv[1] << " " << argv[2] << " " << argv[3];
+    std::filesystem::path rom_path = argv[3];
+
+    if (!std::filesystem::exists(rom_path))
+    {
+        std::cout << "ROM file does not exist." << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
     Display display{atoi(argv[1]), rows, cols};
     Memory memory{};
+    memory.load_rom(rom_path);
 
-    // Checkerboard pattern
+    memory.dump();
 
     while (!display.shouldQuit())
     {
@@ -30,9 +39,6 @@ int main(int argc, char *argv[])
 
         display.draw();
         sleep(1);
-        system("clear");
-        memory[rand() % 0x1000] = 0x16;
-        memory.dump();
     }
 
     return 0;
