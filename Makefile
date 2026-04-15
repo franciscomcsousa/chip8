@@ -3,7 +3,7 @@ CXXFLAGS  = -std=c++17 -Wall $(shell sdl2-config --cflags)
 LIBS      = $(shell sdl2-config --libs)
 SANITIZER = 
  
-SRC       = src/main.cpp src/display.cpp src/memory.cpp
+SRC       = src/main.cpp src/display.cpp src/memory.cpp src/processor.cpp
 TARGET    = chip8
 
 $(TARGET): $(SRC)

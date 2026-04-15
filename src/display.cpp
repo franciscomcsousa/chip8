@@ -2,13 +2,12 @@
 
 #include <iostream>
 
-Display::Display(int scale, int rows, int cols)
-    : scale(scale), rows(rows), cols(cols), pixels(rows, std::vector<char>(cols, 0))
+Display::Display(int scale) : scale(scale), pixels({})
 {
     SDL_Init(SDL_INIT_VIDEO);
     window =
         SDL_CreateWindow("Chip-8", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                         cols * scale, rows * scale, SDL_WINDOW_SHOWN);
+                         COLS * scale, ROWS * scale, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 
@@ -19,16 +18,17 @@ Display::~Display()
     SDL_Quit();
 }
 
-char &Display::operator()(int row, int col)
+// Accessed by (x,y)
+bool &Display::operator()(int col, int row)
 {
     return pixels[row][col];
 }
 
 void Display::draw()
 {
-    for (int y = 0; y < rows; y++)
+    for (int y = 0; y < ROWS; y++)
     {
-        for (int x = 0; x < cols; x++)
+        for (int x = 0; x < COLS; x++)
         {
             SDL_Rect rect = {x * scale, y * scale, scale, scale};
             if (pixels[y][x])
@@ -39,6 +39,13 @@ void Display::draw()
         }
     }
     SDL_RenderPresent(renderer);
+}
+
+void Display::clear()
+{
+    for (int y = 0; y < ROWS; y++)
+        for (int x = 0; x < COLS; x++)
+            pixels[y][x] = 0;
 }
 
 bool Display::shouldQuit()
