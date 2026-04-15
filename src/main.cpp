@@ -33,12 +33,11 @@ int main(int argc, char *argv[])
     memory.load_rom(rom_path);
     memory.dump();
 
-    Processor cpu{};
+    Processor cpu{memory, display};
 
     while (!display.shouldQuit())
     {
-        u_int16_t instr = cpu.fetch(memory);
-        cpu.decode_execute(memory, display, instr);
+        cpu.cycle();
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
     }
 
