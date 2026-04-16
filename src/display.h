@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <array>
+#include <map>
 
 class Display
 {
@@ -15,12 +16,17 @@ public:
 
     void draw();
     void clear();
-    bool shouldQuit();
+    std::array<bool, 16> get_input();
+    bool should_quit();
 
 private:
     SDL_Window *window;
     SDL_Renderer *renderer;
     int scale;
+    bool quit;
 
     std::array<std::array<bool, COLS>, ROWS> pixels;
+    std::array<bool, 16> keys;
+
+    u_int8_t translate_input(int raw_key);
 };

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Display::Display(int scale) : scale(scale), pixels({})
+Display::Display(int scale) : scale(scale), pixels({}), keys({})
 {
     SDL_Init(SDL_INIT_VIDEO);
     window =
@@ -48,11 +48,82 @@ void Display::clear()
             pixels[y][x] = 0;
 }
 
-bool Display::shouldQuit()
+std::array<bool, 16> Display::get_input()
 {
+    quit = false;
     SDL_Event event;
     while (SDL_PollEvent(&event))
-        if (event.type == SDL_QUIT)
-            return true;
-    return false;
+    {
+        int key_code = translate_input(event.key.keysym.sym);
+        switch (event.type)
+        {
+        case SDL_QUIT:
+            quit = true;
+            break;
+        case SDL_KEYDOWN:
+        {
+            if (key_code <= 0xf)
+            {
+                keys[key_code] = 1;
+                std::cout << "Down: " << key_code << std::endl;
+            }
+            break;
+        }
+        case SDL_KEYUP:
+        {
+            if (key_code <= 0xf)
+                keys[key_code] = 0;
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    return keys;
+}
+
+u_int8_t Display::translate_input(int raw_key)
+{
+    switch (raw_key)
+    {
+    case SDLK_x:
+        return 0x0;
+    case SDLK_1:
+        return 0x1;
+    case SDLK_2:
+        return 0x2;
+    case SDLK_3:
+        return 0x3;
+    case SDLK_q:
+        return 0x4;
+    case SDLK_w:
+        return 0x5;
+    case SDLK_e:
+        return 0x6;
+    case SDLK_a:
+        return 0x7;
+    case SDLK_s:
+        return 0x8;
+    case SDLK_d:
+        return 0x9;
+    case SDLK_z:
+        return 0xa;
+    case SDLK_c:
+        return 0xb;
+    case SDLK_4:
+        return 0xc;
+    case SDLK_r:
+        return 0xd;
+    case SDLK_f:
+        return 0xe;
+    case SDLK_v:
+        return 0xf;
+    default:
+        return 0xff;
+    }
+}
+
+bool Display::should_quit()
+{
+    return quit;
 }

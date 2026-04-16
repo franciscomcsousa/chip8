@@ -12,6 +12,7 @@ Processor::~Processor() = default;
 
 void Processor::cycle()
 {
+    display.get_input();
     u_int16_t instr = Processor::fetch();
     Nibbles nibbles = Processor::decode(instr);
     Processor::execute(nibbles);
@@ -44,6 +45,11 @@ void Processor::op_0x0(Nibbles nibbles)
 {
     if (nibbles.nn == 0xe0)
         display.clear();
+    else if (nibbles.nn == 0xee)
+    {
+        pc = stack.top();
+        stack.pop();
+    }
 }
 void Processor::op_0x1(Nibbles nibbles)
 {
@@ -51,15 +57,23 @@ void Processor::op_0x1(Nibbles nibbles)
 }
 void Processor::op_0x2(Nibbles nibbles)
 {
+    stack.push(pc);
+    pc = nibbles.nnn;
 }
 void Processor::op_0x3(Nibbles nibbles)
 {
+    if (v[nibbles.x] == nibbles.nn)
+        pc += 2;
 }
 void Processor::op_0x4(Nibbles nibbles)
 {
+    if (v[nibbles.x] != nibbles.nn)
+        pc += 2;
 }
 void Processor::op_0x5(Nibbles nibbles)
 {
+    if (v[nibbles.x] == v[nibbles.y])
+        pc += 2;
 }
 void Processor::op_0x6(Nibbles nibbles)
 {
@@ -71,9 +85,62 @@ void Processor::op_0x7(Nibbles nibbles)
 }
 void Processor::op_0x8(Nibbles nibbles)
 {
+    // Logic and Arithmetic
+    switch (nibbles.n)
+    {
+    case 0x0: // set
+        v[nibbles.x] = v[nibbles.y];
+        break;
+    case 0x1: // or
+        v[nibbles.x] |= v[nibbles.y];
+        break;
+    case 0x2: // and
+        v[nibbles.x] &= v[nibbles.y];
+        break;
+    case 0x3: // xor
+        v[nibbles.x] ^= v[nibbles.y];
+        break;
+    case 0x4: // add
+    {
+        int result = v[nibbles.x] + v[nibbles.y];
+        v[nibbles.x] = result % (0xff + 1);
+        result > 0xff ? v[0xf] = 1 : v[0xf] = 0;
+        break;
+    }
+    case 0x5: // vx - vy
+    {
+        v[nibbles.x] >= v[nibbles.y] ? v[0xf] = 1 : v[0xf] = 0;
+        v[nibbles.x] -= v[nibbles.y];
+    }
+    case 0x6: // shift left
+    {
+        // TODO - implement CHIP48 version as well
+        v[nibbles.x] = v[nibbles.y];
+        v[0xf] = v[nibbles.x] & 0b1;
+        v[nibbles.x] >>= 1;
+    }
+    case 0x7: // vy - vx
+    {
+        v[nibbles.y] >= v[nibbles.x] ? v[0xf] = 1 : v[0xf] = 0;
+        v[nibbles.x] = v[nibbles.y] - v[nibbles.x];
+        ;
+    }
+    case 0xe: // shift right
+    {
+        // TODO - implement CHIP48 version as well
+        v[nibbles.x] = v[nibbles.y];
+        v[0xf] = v[nibbles.x] & 0b1;
+        v[nibbles.x] <<= 1;
+    }
+
+    default:
+        break;
+    }
 }
 void Processor::op_0x9(Nibbles nibbles)
 {
+    if (v[nibbles.x] != v[nibbles.y])
+        pc += 2;
 }
 void Processor::op_0xa(Nibbles nibbles)
 {
@@ -81,9 +148,12 @@ void Processor::op_0xa(Nibbles nibbles)
 }
 void Processor::op_0xb(Nibbles nibbles)
 {
+    // TODO - implement CHIP48 version as well
+    pc = v[0x0] + nibbles.nnn;
 }
 void Processor::op_0xc(Nibbles nibbles)
 {
+    // TODO
 }
 void Processor::op_0xd(Nibbles nibbles)
 {
@@ -108,7 +178,9 @@ void Processor::op_0xd(Nibbles nibbles)
 }
 void Processor::op_0xe(Nibbles nibbles)
 {
+    // TODO
 }
 void Processor::op_0xf(Nibbles nibbles)
 {
+    // TODO
 }

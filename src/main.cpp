@@ -31,11 +31,11 @@ int main(int argc, char *argv[])
 
     Memory memory{};
     memory.load_rom(rom_path);
-    memory.dump();
+    //memory.dump();
 
     Processor cpu{memory, display};
 
-    while (!display.shouldQuit())
+    while (!display.should_quit())
     {
         cpu.cycle();
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
