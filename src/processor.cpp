@@ -1,18 +1,24 @@
 #include "processor.h"
 #include <iostream>
 
-Processor::Processor(Memory &memory, Display &display) : stack(),
-                                                         v(),
-                                                         vi(),
-                                                         pc(0x200),
-                                                         memory(memory),
-                                                         display(display) {}
+Processor::Processor(Memory &memory, Display &display) : stack(), v(), vi(), pc(0x200), memory(memory), display(display)
+{
+    std::srand(std::time({}));
+}
 
 Processor::~Processor() = default;
 
 void Processor::cycle()
 {
-    display.get_input();
+    keys = display.get_input();
+
+    // TODO - should be synchronized at 60hz, not with cpu clock
+    if (delay_timer > 0)
+        delay_timer--;
+
+    if (sound_timer > 0)
+        sound_timer--;
+
     u_int16_t instr = Processor::fetch();
     Nibbles nibbles = Processor::decode(instr);
     Processor::execute(nibbles);
@@ -114,8 +120,8 @@ void Processor::op_0x8(Nibbles nibbles)
     }
     case 0x6: // shift left
     {
-        // TODO - implement CHIP48 version as well
-        v[nibbles.x] = v[nibbles.y];
+        // TODO - implement classic version as well
+        // v[nibbles.x] = v[nibbles.y];
         v[0xf] = v[nibbles.x] & 0b1;
         v[nibbles.x] >>= 1;
     }
@@ -127,12 +133,11 @@ void Processor::op_0x8(Nibbles nibbles)
     }
     case 0xe: // shift right
     {
-        // TODO - implement CHIP48 version as well
-        v[nibbles.x] = v[nibbles.y];
+        // TODO - implement classic version as well
+        // v[nibbles.x] = v[nibbles.y];
         v[0xf] = v[nibbles.x] & 0b1;
         v[nibbles.x] <<= 1;
     }
-
     default:
         break;
     }
@@ -148,12 +153,13 @@ void Processor::op_0xa(Nibbles nibbles)
 }
 void Processor::op_0xb(Nibbles nibbles)
 {
-    // TODO - implement CHIP48 version as well
-    pc = v[0x0] + nibbles.nnn;
+    // TODO - implement classic version as well
+    // pc = v[0x0] + nibbles.nnn;
+    pc = v[nibbles.x] + nibbles.nnn;
 }
 void Processor::op_0xc(Nibbles nibbles)
 {
-    // TODO
+    v[nibbles.x] = std::rand() & nibbles.nn;
 }
 void Processor::op_0xd(Nibbles nibbles)
 {
@@ -178,9 +184,76 @@ void Processor::op_0xd(Nibbles nibbles)
 }
 void Processor::op_0xe(Nibbles nibbles)
 {
-    // TODO
+    if ((nibbles.nn == 0x9e && keys[nibbles.x] == 1) || (nibbles.nn == 0xa1 && keys[nibbles.x] == 0))
+        pc += 2;
 }
 void Processor::op_0xf(Nibbles nibbles)
 {
-    // TODO
+    switch (nibbles.nn)
+    {
+    case 0x07:
+        v[nibbles.x] = delay_timer;
+        break;
+    case 0x15:
+        delay_timer = v[nibbles.x];
+        break;
+    case 0x18:
+        sound_timer = v[nibbles.x];
+        break;
+    case 0x1e:
+    {
+        vi + v[nibbles.x] > 0xfff ? v[0xf] = 1 : v[0xf] = 0;
+        vi += v[nibbles.x];
+        break;
+    }
+    case 0x0a:
+    {
+        pc -= 2;
+        for (u_int16_t i = 0; i < v.size(); i++)
+        {
+            if (keys[i] == 1)
+            {
+                v[nibbles.x] = i;
+                pc += 2;
+                break;
+            }
+        }
+        break;
+    }
+    case 0x29:
+    {
+        vi = Memory::FONTSTART * (v[nibbles.x] * 5);
+        break;
+    }
+    case 0x33:
+    {
+        u_int16_t num = v[nibbles.x];
+        for (int i = 2; i >= 0; i--)
+        {
+            memory[vi + i] = num % 10;
+            num /= 10;
+        }
+        break;
+    }
+    case 0x55:
+    {
+        // TODO - implement classic form as well
+        for (int i = 0; i <= 0xf; i++)
+        {
+            v[i] = memory[i + vi];
+        }
+        break;
+    }
+    case 0x65:
+    {
+        // TODO - implement classic form as well
+        for (int i = 0; i <= 0xf; i++)
+        {
+            memory[i + vi] = v[i];
+        }
+        break;
+    }
+    default:
+        break;
+    }
 }

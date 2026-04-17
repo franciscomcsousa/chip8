@@ -5,13 +5,16 @@
 Memory::Memory() : data()
 {
     for (size_t i = 0; i < fonts.size(); i++)
-        data[i + 0x50] = fonts[i];
+        data[i + FONTSTART] = fonts[i];
 }
 
 Memory::~Memory() = default;
 
 u_int16_t &Memory::operator[](uint16_t address)
 {
+    if (address >= MEMORYSIZE)
+        throw std::out_of_range("Memory access out of bounds: 0x" + std::to_string(address));
+    
     return data[address];
 }
 
@@ -35,7 +38,7 @@ void Memory::load_rom(std::filesystem::path &filepath)
 
     for (size_t i = 0; i < length; i++)
         data[i + 0x200] = (unsigned char)buffer[i];
-    
+
     delete[] buffer;
 }
 

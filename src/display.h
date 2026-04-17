@@ -9,6 +9,8 @@ public:
     Display(int scale);
     ~Display();
 
+    using Keys = std::array<bool, 16>;
+
     bool &operator()(int row, int col);
 
     static constexpr int ROWS = 32;
@@ -16,7 +18,7 @@ public:
 
     void draw();
     void clear();
-    std::array<bool, 16> get_input();
+    Keys get_input();
     bool should_quit();
 
 private:
@@ -26,7 +28,7 @@ private:
     bool quit;
 
     std::array<std::array<bool, COLS>, ROWS> pixels;
-    std::array<bool, 16> keys;
+    Keys keys;
 
     u_int8_t translate_input(int raw_key);
 };

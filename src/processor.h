@@ -26,8 +26,11 @@ private:
     std::array<uint16_t, 16> v; // labeled V0 to VF
     uint16_t vi;
     uint16_t pc;
+    uint16_t delay_timer;
+    uint16_t sound_timer;
     Memory &memory;
     Display &display;
+    Display::Keys keys;
 
     u_int16_t fetch();
     Nibbles decode(u_int16_t instruction);

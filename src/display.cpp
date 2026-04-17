@@ -48,7 +48,7 @@ void Display::clear()
             pixels[y][x] = 0;
 }
 
-std::array<bool, 16> Display::get_input()
+Display::Keys Display::get_input()
 {
     quit = false;
     SDL_Event event;

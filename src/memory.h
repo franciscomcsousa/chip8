@@ -9,6 +9,9 @@ public:
     Memory();
     ~Memory();
 
+    static constexpr uint16_t MEMORYSIZE = 4096;
+    static constexpr uint16_t FONTSTART = 0x50;
+
     u_int16_t &operator[](uint16_t address);
 
     void load_rom(std::filesystem::path &filepath);
@@ -16,7 +19,6 @@ public:
     void dump(); // debug purposes
 
 private:
-    static constexpr uint16_t MEMORYSIZE = 4096;
     std::array<u_int16_t, MEMORYSIZE> data;
     static constexpr std::array<u_int16_t, 16 * 5> fonts = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
