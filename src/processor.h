@@ -23,11 +23,11 @@ public:
 
 private:
     std::stack<uint16_t> stack;
-    std::array<uint16_t, 16> v; // labeled V0 to VF
+    std::array<uint8_t, 16> v; // labeled V0 to VF
     uint16_t vi;
     uint16_t pc;
-    uint16_t delay_timer;
-    uint16_t sound_timer;
+    uint8_t delay_timer;
+    uint8_t sound_timer;
     Memory &memory;
     Display &display;
     Display::Keys keys;

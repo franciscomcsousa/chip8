@@ -117,6 +117,7 @@ void Processor::op_0x8(Nibbles nibbles)
     {
         v[nibbles.x] >= v[nibbles.y] ? v[0xf] = 1 : v[0xf] = 0;
         v[nibbles.x] -= v[nibbles.y];
+        break;
     }
     case 0x6: // shift left
     {
@@ -124,12 +125,13 @@ void Processor::op_0x8(Nibbles nibbles)
         // v[nibbles.x] = v[nibbles.y];
         v[0xf] = v[nibbles.x] & 0b1;
         v[nibbles.x] >>= 1;
+        break;
     }
     case 0x7: // vy - vx
     {
         v[nibbles.y] >= v[nibbles.x] ? v[0xf] = 1 : v[0xf] = 0;
         v[nibbles.x] = v[nibbles.y] - v[nibbles.x];
-        ;
+        break;
     }
     case 0xe: // shift right
     {
@@ -137,6 +139,7 @@ void Processor::op_0x8(Nibbles nibbles)
         // v[nibbles.x] = v[nibbles.y];
         v[0xf] = v[nibbles.x] & 0b1;
         v[nibbles.x] <<= 1;
+        break;
     }
     default:
         break;
@@ -164,16 +167,16 @@ void Processor::op_0xc(Nibbles nibbles)
 void Processor::op_0xd(Nibbles nibbles)
 {
     // Display
-    u_int16_t x_cord = v[nibbles.x] % Display::COLS;
-    u_int16_t y_cord = v[nibbles.y] % Display::ROWS;
+    u_int8_t x_cord = v[nibbles.x] % Display::COLS;
+    u_int8_t y_cord = v[nibbles.y] % Display::ROWS;
     v[0xf] = 0; // collision register
 
     for (int i = 0; i < nibbles.n && y_cord + i <= Display::ROWS; i++)
     {
-        u_int16_t row_byte = memory[vi + i];
+        u_int8_t row_byte = memory[vi + i];
         for (int j = 0; j < 0x8 && x_cord + j <= Display::COLS; j++)
         {
-            u_int16_t pixel = ((row_byte) >> (0x7 - j) & 0b1);
+            u_int8_t pixel = ((row_byte) >> (0x7 - j) & 0b1);
             if (pixel && display(x_cord + j, y_cord + i))
                 v[0xf] = 1;
 
@@ -209,7 +212,7 @@ void Processor::op_0xf(Nibbles nibbles)
     case 0x0a:
     {
         pc -= 2;
-        for (u_int16_t i = 0; i < v.size(); i++)
+        for (u_int8_t i = 0; i < v.size(); i++)
         {
             if (keys[i] == 1)
             {
