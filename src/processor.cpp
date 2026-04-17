@@ -238,22 +238,18 @@ void Processor::op_0xf(Nibbles nibbles)
         }
         break;
     }
-    case 0x55:
+    case 0x55: // Store
     {
         // TODO - implement classic form as well
-        for (int i = 0; i <= 0xf; i++)
-        {
-            v[i] = memory[i + vi];
-        }
+        for (u_int8_t i = 0; i <= nibbles.x; i++)
+            memory[vi + i] = v[i];
         break;
     }
-    case 0x65:
+    case 0x65: // Load
     {
         // TODO - implement classic form as well
-        for (int i = 0; i <= 0xf; i++)
-        {
-            memory[i + vi] = v[i];
-        }
+        for (u_int8_t i = 0; i <= nibbles.x; i++)
+            v[i] = memory[vi + i];
         break;
     }
     default:
