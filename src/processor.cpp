@@ -187,7 +187,11 @@ void Processor::op_0xd(Nibbles nibbles)
 }
 void Processor::op_0xe(Nibbles nibbles)
 {
-    if ((nibbles.nn == 0x9e && keys[nibbles.x] == 1) || (nibbles.nn == 0xa1 && keys[nibbles.x] == 0))
+    // Skip if key down
+    if (nibbles.nn == 0x9e && keys[v[nibbles.x]] == 1)
+        pc += 2;
+    // Skip if key up
+    else if (nibbles.nn == 0xa1 && keys[v[nibbles.x]] == 0)
         pc += 2;
 }
 void Processor::op_0xf(Nibbles nibbles)

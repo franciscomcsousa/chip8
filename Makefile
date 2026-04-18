@@ -1,5 +1,5 @@
 CXX       = g++
-CXXFLAGS  = -std=c++17 -Wall $(shell sdl2-config --cflags)
+CXXFLAGS  = -std=c++17 -Wall -g $(shell sdl2-config --cflags)
 LIBS      = $(shell sdl2-config --libs)
 SANITIZER = 
  

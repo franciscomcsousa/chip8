@@ -65,7 +65,6 @@ Display::Keys Display::get_input()
             if (key_code <= 0xf)
             {
                 keys[key_code] = 1;
-                std::cout << "Down: " << key_code << std::endl;
             }
             break;
         }
