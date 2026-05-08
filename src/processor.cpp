@@ -115,30 +115,34 @@ void Processor::op_0x8(Nibbles nibbles)
     }
     case 0x5: // vx - vy
     {
-        v[nibbles.x] >= v[nibbles.y] ? v[0xf] = 1 : v[0xf] = 0;
-        v[nibbles.x] -= v[nibbles.y];
+        int result = v[nibbles.x] - v[nibbles.y];
+        v[nibbles.x] = result;
+        result >= 0 ? v[0xf] = 1 : v[0xf] = 0;
         break;
     }
-    case 0x6: // shift left
+    case 0x6: // shift right
     {
         // TODO - implement classic version as well
         // v[nibbles.x] = v[nibbles.y];
-        v[0xf] = v[nibbles.x] & 0b1;
+        u_int8_t shifted = v[nibbles.x] & 0b1; // get least significant bit
         v[nibbles.x] >>= 1;
+        v[0xf] = shifted;
         break;
     }
     case 0x7: // vy - vx
     {
-        v[nibbles.y] >= v[nibbles.x] ? v[0xf] = 1 : v[0xf] = 0;
-        v[nibbles.x] = v[nibbles.y] - v[nibbles.x];
+        int result = v[nibbles.y] - v[nibbles.x];
+        v[nibbles.x] = result;
+        result >= 0 ? v[0xf] = 1 : v[0xf] = 0;
         break;
     }
-    case 0xe: // shift right
+    case 0xe: // shift left
     {
         // TODO - implement classic version as well
         // v[nibbles.x] = v[nibbles.y];
-        v[0xf] = v[nibbles.x] & 0b1;
+        u_int8_t shifted = v[nibbles.x] >> 7; // get most significant bit
         v[nibbles.x] <<= 1;
+        v[0xf] = shifted;
         break;
     }
     default:
@@ -209,8 +213,9 @@ void Processor::op_0xf(Nibbles nibbles)
         break;
     case 0x1e:
     {
-        vi + v[nibbles.x] > 0xfff ? v[0xf] = 1 : v[0xf] = 0;
-        vi += v[nibbles.x];
+        int result = vi + v[nibbles.x];
+        vi = result;
+        result > 0xfff ? v[0xf] = 1 : v[0xf] = 0;
         break;
     }
     case 0x0a:
